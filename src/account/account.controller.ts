@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { Account } from '@prisma/client';
 import { CreateAccountDto } from './dto/create-account.dto';
@@ -22,9 +22,15 @@ export class AccountController {
 
   @Get()
   @ApiResponse({ status: 200, description: 'Successfully retrieved accounts.' })
-  async findAll(@Res() res: Response) {
+  async findAll() {
     const account = await this.accountService.getAllAccounts();
-    const downloadPdf = await this.accountService.downloadAccountsPDF(res);
+    // const downloadPdf = await this.accountService.downloadAccountsPDF(res);
     return account;
+  }
+
+  @Get('pdf/:id')
+  async downloadPdf(@Res() res: Response, @Param('id') id: string) {
+    const downloadPdf = await this.accountService.downloadAccountPDF(res, id);
+    return downloadPdf;
   }
 }

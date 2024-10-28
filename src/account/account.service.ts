@@ -48,12 +48,73 @@ export class AccountService {
 
   //     doc.end();
   //   }
-  async downloadAccountsPDF(res: Response) {
-    const accounts = await this.getAllAccounts();
+  //   async downloadAccountsPDF(res: Response) {
+  //     const accounts = await this.prisma.account.findUnique({
+  //         where: {id}
+  //     });
+
+  //     const doc = new PDFDocument({ margin: 50 });
+
+  //     const pdfName = `accounts_${new Date().toISOString().split('T')[0]}.pdf`;
+  //     res.setHeader('Content-Type', 'application/pdf');
+  //     res.setHeader('Content-Disposition', `attachment; filename=${pdfName}`);
+
+  //     doc.pipe(res);
+
+  //     doc
+  //       .fontSize(25)
+  //       .font('Helvetica-Bold')
+  //       .fillColor('#4B4B4B')
+  //       .text('Accounts List', { align: 'center' })
+  //       .moveDown(1.5);
+
+  //     accounts.forEach((account, index) => {
+  //       doc
+  //         .fontSize(18)
+  //         .font('Helvetica-Bold')
+  //         .fillColor('#333333')
+  //         .text(`Account ${index + 1}`, { underline: true })
+  //         .moveDown(0.5);
+
+  //       doc
+  //         .fontSize(12)
+  //         .font('Helvetica')
+  //         .fillColor('#000000')
+  //         .text(`Name: ${account.name}`)
+  //         .text(`Mobile No: ${account.mobileNo || 'N/A'}`)
+  //         .text(`Email: ${account.email || 'N/A'}`)
+  //         .text(`Address: ${account.address || 'N/A'}`)
+  //         .text(`Type: ${account.type || 'N/A'}`)
+  //         .text(`Pixel: ${account.pixel || 'N/A'}`)
+  //         .text(`Height: ${account.height || 'N/A'}`)
+  //         .text(`Length: ${account.length || 'N/A'}`)
+  //         .moveDown(1);
+
+  //       if (index < accounts.length - 1) {
+  //         doc
+  //           .moveTo(doc.page.margins.left, doc.y)
+  //           .lineTo(doc.page.width - doc.page.margins.right, doc.y)
+  //           .strokeColor('#aaaaaa')
+  //           .stroke()
+  //           .moveDown();
+  //       }
+  //     });
+
+  //     doc.end();
+  //   }
+
+  async downloadAccountPDF(res: Response, id: string) {
+    const account = await this.prisma.account.findUnique({
+      where: { id },
+    });
+    if (!account) {
+      res.status(404).send('Account not found');
+      return;
+    }
 
     const doc = new PDFDocument({ margin: 50 });
 
-    const pdfName = `accounts_${new Date().toISOString().split('T')[0]}.pdf`;
+    const pdfName = `account_${account.name || 'unknown'}_${new Date().toISOString().split('T')[0]}.pdf`;
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=${pdfName}`);
 
@@ -63,40 +124,29 @@ export class AccountService {
       .fontSize(25)
       .font('Helvetica-Bold')
       .fillColor('#4B4B4B')
-      .text('Accounts List', { align: 'center' })
+      .text('Account Details', { align: 'center' })
       .moveDown(1.5);
 
-    accounts.forEach((account, index) => {
-      doc
-        .fontSize(18)
-        .font('Helvetica-Bold')
-        .fillColor('#333333')
-        .text(`Account ${index + 1}`, { underline: true })
-        .moveDown(0.5);
+    doc
+      .fontSize(18)
+      .font('Helvetica-Bold')
+      .fillColor('#333333')
+      .text(`Account Name: ${account.name}`, { underline: true })
+      .moveDown(0.5);
 
-      doc
-        .fontSize(12)
-        .font('Helvetica')
-        .fillColor('#000000')
-        .text(`Name: ${account.name}`)
-        .text(`Mobile No: ${account.mobileNo || 'N/A'}`)
-        .text(`Email: ${account.email || 'N/A'}`)
-        .text(`Address: ${account.address || 'N/A'}`)
-        .text(`Type: ${account.type || 'N/A'}`)
-        .text(`Pixel: ${account.pixel || 'N/A'}`)
-        .text(`Height: ${account.height || 'N/A'}`)
-        .text(`Length: ${account.length || 'N/A'}`)
-        .moveDown(1);
-
-      if (index < accounts.length - 1) {
-        doc
-          .moveTo(doc.page.margins.left, doc.y)
-          .lineTo(doc.page.width - doc.page.margins.right, doc.y)
-          .strokeColor('#aaaaaa')
-          .stroke()
-          .moveDown();
-      }
-    });
+    doc
+      .fontSize(12)
+      .font('Helvetica')
+      .fillColor('#000000')
+      .text(`Name: ${account.name}`)
+      .text(`Mobile No: ${account.mobileNo || 'N/A'}`)
+      .text(`Email: ${account.email || 'N/A'}`)
+      .text(`Address: ${account.address || 'N/A'}`)
+      .text(`Type: ${account.type || 'N/A'}`)
+      .text(`Pixel: ${account.pixel || 'N/A'}`)
+      .text(`Height: ${account.height || 'N/A'}`)
+      .text(`Length: ${account.length || 'N/A'}`)
+      .moveDown(1);
 
     doc.end();
   }
